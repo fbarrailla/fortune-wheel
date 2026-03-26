@@ -9,13 +9,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --c1: oklch(62% 0.22 25);    /* red-orange */
-      --c2: oklch(72% 0.18 145);   /* emerald */
-      --c3: oklch(65% 0.20 270);   /* violet */
-      --c4: oklch(78% 0.19 60);    /* gold */
       --bg: oklch(14% 0.02 260);
       --surface: oklch(18% 0.025 260);
+      --surface2: oklch(22% 0.03 260);
+      --border: oklch(32% 0.04 260);
       --text: oklch(94% 0.01 260);
+      --muted: oklch(58% 0.04 260);
+      --gold: oklch(78% 0.19 60);
+      --gold-dark: oklch(52% 0.15 40);
     }
 
     body {
@@ -30,13 +31,11 @@
       overflow: hidden;
     }
 
-    /* Subtle radial background glow */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 50%, oklch(25% 0.06 270 / 0.5), transparent 70%);
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, oklch(25% 0.06 270 / 0.5), transparent 70%);
       pointer-events: none;
     }
 
@@ -50,15 +49,13 @@
       text-shadow: 0 2px 24px oklch(78% 0.19 60 / 0.3);
     }
 
-    /* ── Wheel scene ── */
+    /* ── Wheel ── */
     .scene {
       position: relative;
       width: min(420px, 88vw);
       aspect-ratio: 1;
-      perspective: 900px;
     }
 
-    /* Pointer arrow */
     .pointer {
       position: absolute;
       top: -22px;
@@ -69,23 +66,19 @@
       height: 0;
       border-left: 18px solid transparent;
       border-right: 18px solid transparent;
-      border-top: 38px solid oklch(94% 0.18 60);
+      border-top: 38px solid var(--gold);
       filter: drop-shadow(0 4px 12px oklch(78% 0.19 60 / 0.7));
     }
 
-    .wheel-wrap {
-      width: 100%;
-      height: 100%;
-    }
+    .wheel-wrap { width: 100%; height: 100%; }
 
-    canvas {
+    canvas#wheel {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       display: block;
     }
 
-    /* Hub cap */
     .hub {
       position: absolute;
       top: 50%; left: 50%;
@@ -97,10 +90,7 @@
         oklch(55% 0.02 260) 60%,
         oklch(28% 0.02 260)
       );
-      box-shadow:
-        0 2px 10px oklch(0% 0 0 / 0.5),
-        inset 0 1px 3px oklch(100% 0 0 / 0.4),
-        inset 0 -2px 4px oklch(0% 0 0 / 0.3);
+      box-shadow: 0 2px 10px oklch(0% 0 0 / 0.5), inset 0 1px 3px oklch(100% 0 0 / 0.4), inset 0 -2px 4px oklch(0% 0 0 / 0.3);
       z-index: 10;
     }
     .hub::after {
@@ -114,43 +104,191 @@
       box-shadow: 0 0 8px oklch(78% 0.19 60 / 0.8);
     }
 
-    /* ── Button ── */
+    /* ── Buttons row ── */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      align-items: center;
+    }
+
     .spin-btn {
-      margin-top: 3rem;
       padding: 1rem 3.5rem;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.5rem;
       letter-spacing: 0.18em;
       color: oklch(12% 0.01 260);
-      background: linear-gradient(160deg,
-        oklch(82% 0.19 60),
-        oklch(68% 0.22 40)
-      );
+      background: linear-gradient(160deg, oklch(82% 0.19 60), oklch(68% 0.22 40));
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      position: relative;
       transition: transform 0.1s, box-shadow 0.1s;
-      box-shadow:
-        0 4px 0 oklch(48% 0.14 40),
-        0 6px 24px oklch(68% 0.22 40 / 0.35);
+      box-shadow: 0 4px 0 var(--gold-dark), 0 6px 24px oklch(68% 0.22 40 / 0.35);
     }
-    .spin-btn:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 6px 0 oklch(48% 0.14 40),
-        0 10px 32px oklch(68% 0.22 40 / 0.45);
+    .spin-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 0 var(--gold-dark), 0 10px 32px oklch(68% 0.22 40 / 0.45); }
+    .spin-btn:active { transform: translateY(2px);  box-shadow: 0 2px 0 var(--gold-dark), 0 4px 12px oklch(68% 0.22 40 / 0.3); }
+    .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .manage-btn {
+      width: 48px; height: 48px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      flex-shrink: 0;
     }
-    .spin-btn:active {
-      transform: translateY(2px);
-      box-shadow:
-        0 2px 0 oklch(48% 0.14 40),
-        0 4px 12px oklch(68% 0.22 40 / 0.3);
+    .manage-btn:hover { color: var(--text); border-color: oklch(50% 0.05 260); background: oklch(26% 0.035 260); }
+    .manage-btn svg { width: 20px; height: 20px; }
+
+    /* ── Admin panel ── */
+    .panel-backdrop {
+      position: fixed;
+      inset: 0;
+      background: oklch(8% 0.02 260 / 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
     }
-    .spin-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+    .panel-backdrop.open { opacity: 1; pointer-events: all; }
+
+    .panel {
+      position: fixed;
+      top: 0; right: 0;
+      height: 100%;
+      width: min(380px, 100vw);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 51;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .panel.open { transform: translateX(0); }
+
+    .panel-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      color: oklch(92% 0.04 60);
+    }
+    .panel-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+    .panel-close svg { width: 20px; height: 20px; }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 4px;
+      background: var(--surface2);
+      border: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+    .player-item:hover { border-color: var(--border); }
+
+    .player-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .player-name {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .player-remove {
+      background: none;
+      border: none;
+      color: oklch(45% 0.05 260);
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      border-radius: 3px;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+    .player-remove:hover { color: oklch(70% 0.18 25); background: oklch(28% 0.04 25); }
+    .player-remove svg { width: 16px; height: 16px; }
+
+    .panel-footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .add-form {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .add-input {
+      flex: 1;
+      padding: 0.6rem 0.75rem;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .add-input::placeholder { color: var(--muted); }
+    .add-input:focus { border-color: oklch(55% 0.08 270); }
+    .add-btn {
+      padding: 0.6rem 1rem;
+      background: oklch(55% 0.14 270);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .add-btn:hover { background: oklch(62% 0.16 270); }
+
+    .empty-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 2rem 0;
     }
 
     /* ── Winner overlay ── */
@@ -168,10 +306,7 @@
       pointer-events: none;
       transition: opacity 0.4s;
     }
-    .winner-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
+    .winner-overlay.show { opacity: 1; pointer-events: all; }
     .winner-card {
       text-align: center;
       padding: 3rem 4rem;
@@ -182,14 +317,12 @@
       transform: scale(0.88);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .winner-overlay.show .winner-card {
-      transform: scale(1);
-    }
+    .winner-overlay.show .winner-card { transform: scale(1); }
     .winner-label {
       font-size: 0.85rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: oklch(60% 0.04 260);
+      color: var(--muted);
       margin-bottom: 0.75rem;
     }
     .winner-name {
@@ -206,24 +339,15 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       background: transparent;
-      border: 1.5px solid oklch(45% 0.05 260);
+      border: 1.5px solid var(--border);
       color: var(--text);
       border-radius: 4px;
       cursor: pointer;
       transition: background 0.15s, border-color 0.15s;
     }
-    .winner-close:hover {
-      background: oklch(25% 0.03 260);
-      border-color: oklch(60% 0.05 260);
-    }
+    .winner-close:hover { background: oklch(25% 0.03 260); border-color: oklch(60% 0.05 260); }
 
-    /* Confetti canvas */
-    #confetti {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 99;
-    }
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
   </style>
 </head>
 <body>
@@ -238,7 +362,35 @@
     </div>
   </div>
 
-  <button class="spin-btn" id="spinBtn">SPIN</button>
+  <div class="controls">
+    <button class="spin-btn" id="spinBtn">SPIN</button>
+    <button class="manage-btn" id="manageBtn" title="Manage players">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Admin panel -->
+  <div class="panel-backdrop" id="backdrop"></div>
+  <div class="panel" id="panel">
+    <div class="panel-header">
+      <span class="panel-title">Players</span>
+      <button class="panel-close" id="panelClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-body" id="playerList"></div>
+    <div class="panel-footer">
+      <div class="add-form">
+        <input class="add-input" id="addInput" type="text" placeholder="Add player name…" maxlength="40" />
+        <button class="add-btn" id="addBtn">Add</button>
+      </div>
+    </div>
+  </div>
 
   <canvas id="confetti"></canvas>
 
@@ -251,36 +403,73 @@
   </div>
 
   <script>
-    const NAMES = ['langtu.daknong', 'flywithpunit', 'omi.maq', 'adryx_jatin'];
-
-    // Colors in hex for canvas (OKLCH approximations)
-    const COLORS = [
-      { fill: '#e8442a', dark: '#a02f1c', light: '#f07060' },  // red-orange
-      { fill: '#2db870', dark: '#1a7a47', light: '#5ad696' },  // emerald
-      { fill: '#7c4dcc', dark: '#4e2e88', light: '#a87de8' },  // violet
-      { fill: '#d4a020', dark: '#8e6a12', light: '#f0c84a' },  // gold
+    // ── Color palette (cycles if more players than colors) ──
+    const PALETTE = [
+      { fill: '#e8442a', dark: '#a02f1c', light: '#f07060' },
+      { fill: '#2db870', dark: '#1a7a47', light: '#5ad696' },
+      { fill: '#7c4dcc', dark: '#4e2e88', light: '#a87de8' },
+      { fill: '#d4a020', dark: '#8e6a12', light: '#f0c84a' },
+      { fill: '#1aa8cc', dark: '#0e6a82', light: '#52ccee' },
+      { fill: '#e0407a', dark: '#962a52', light: '#f07aa8' },
+      { fill: '#e86a1a', dark: '#9a4610', light: '#f09a5a' },
+      { fill: '#3ab87a', dark: '#22784e', light: '#6ad4a0' },
+      { fill: '#9b3dc8', dark: '#652688', light: '#c070e8' },
+      { fill: '#2a8fd4', dark: '#1a5c8a', light: '#60b8f0' },
     ];
 
-    const N = NAMES.length;
-    const SLICE = (2 * Math.PI) / N;
+    const DEFAULT_PLAYERS = [
+      'langtu.daknong','flywithpunit','omi.maq','adryx_jatin',
+      'krisnguyen995','dirk789','nhannt0605','hanru.nguyen','4.k.93','hannhi_99'
+    ];
+
+    // ── State (persisted) ──
+    function loadPlayers() {
+      try {
+        const saved = localStorage.getItem('fw-players');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+      return [...DEFAULT_PLAYERS];
+    }
+    function savePlayers(list) {
+      localStorage.setItem('fw-players', JSON.stringify(list));
+    }
+
+    let players = loadPlayers();
+
+    // ── Canvas setup ──
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const W = canvas.width;
     const CX = W / 2, CY = W / 2, R = W / 2 - 8;
 
-    let angle = 0;        // current rotation
+    let angle = 0;
     let spinning = false;
+
+    function colorFor(i) { return PALETTE[i % PALETTE.length]; }
 
     function drawWheel(rot) {
       ctx.clearRect(0, 0, W, W);
+      const n = players.length;
+      if (n === 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.beginPath();
+        ctx.arc(CX, CY, R, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = `600 28px 'DM Sans', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No players', CX, CY);
+        return;
+      }
+      const slice = (2 * Math.PI) / n;
 
-      for (let i = 0; i < N; i++) {
-        const start = rot + i * SLICE;
-        const end = start + SLICE;
-        const mid = start + SLICE / 2;
-        const col = COLORS[i];
+      for (let i = 0; i < n; i++) {
+        const start = rot + i * slice;
+        const end = start + slice;
+        const mid = start + slice / 2;
+        const col = colorFor(i);
 
-        // Main segment fill with radial gradient for 3D shine
         const grd = ctx.createRadialGradient(CX, CY, R * 0.08, CX, CY, R);
         grd.addColorStop(0, col.light);
         grd.addColorStop(0.45, col.fill);
@@ -293,12 +482,10 @@
         ctx.fillStyle = grd;
         ctx.fill();
 
-        // Segment border
         ctx.strokeStyle = 'rgba(0,0,0,0.35)';
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Highlight rim arc
         ctx.save();
         ctx.beginPath();
         ctx.arc(CX, CY, R - 4, start + 0.04, end - 0.04);
@@ -307,27 +494,21 @@
         ctx.stroke();
         ctx.restore();
 
-        // Text
         ctx.save();
         ctx.translate(CX, CY);
         ctx.rotate(mid);
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-
-        const textR = R * 0.84;
-        // shadow
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
         ctx.shadowBlur = 6;
         ctx.shadowOffsetY = 2;
-
-        const fontSize = Math.min(36, Math.max(22, (R * 0.18)));
+        const fontSize = Math.min(36, Math.max(16, R * 0.18));
         ctx.font = `700 ${fontSize}px 'DM Sans', sans-serif`;
         ctx.fillStyle = '#fff';
-        ctx.fillText(NAMES[i], textR, 0);
+        ctx.fillText(players[i], R * 0.84, 0);
         ctx.restore();
       }
 
-      // Outer ring bevel
       const ring = ctx.createLinearGradient(CX - R, CY - R, CX + R, CY + R);
       ring.addColorStop(0, 'rgba(255,255,255,0.22)');
       ring.addColorStop(0.5, 'rgba(255,255,255,0.04)');
@@ -341,66 +522,49 @@
 
     drawWheel(angle);
 
-    // ── Spin logic ──
+    // ── Spin ──
     const spinBtn = document.getElementById('spinBtn');
 
     spinBtn.addEventListener('click', () => {
-      if (spinning) return;
+      if (spinning || players.length < 2) return;
       spinning = true;
       spinBtn.disabled = true;
 
-      // Random target: many full turns + random stop
       const extraTurns = 6 + Math.floor(Math.random() * 5);
       const randomStop = Math.random() * Math.PI * 2;
       const totalRotation = extraTurns * Math.PI * 2 + randomStop;
-
       const duration = 4200 + Math.random() * 800;
       const startAngle = angle;
       const startTime = performance.now();
 
-      function easeOutQuint(t) {
-        return 1 - Math.pow(1 - t, 5);
-      }
+      function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
 
       function frame(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(elapsed / duration, 1);
-        const eased = easeOutQuint(t);
-        angle = startAngle + totalRotation * eased;
+        const t = Math.min((now - startTime) / duration, 1);
+        angle = startAngle + totalRotation * easeOutQuint(t);
         drawWheel(angle);
-
-        if (t < 1) {
-          requestAnimationFrame(frame);
-        } else {
-          angle = startAngle + totalRotation;
-          drawWheel(angle);
-          spinning = false;
-          showWinner();
-        }
+        if (t < 1) { requestAnimationFrame(frame); }
+        else { spinning = false; showWinner(); }
       }
-
       requestAnimationFrame(frame);
     });
 
     function getWinner() {
-      // Pointer is at top (angle = -PI/2 from canvas right = 0).
-      // Normalize angle so 0 = right, positive = clockwise.
-      // Pointer at top means we check which segment covers -PI/2 (270°).
+      const n = players.length;
+      const slice = (2 * Math.PI) / n;
       const normalized = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
       const pointerAngle = (Math.PI * 2 - Math.PI / 2 + Math.PI * 2) % (Math.PI * 2);
-      // Which segment is under pointer?
-      const shifted = (pointerAngle - normalized % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-      const idx = Math.floor(shifted / SLICE) % N;
-      return { name: NAMES[idx], color: COLORS[idx] };
+      const shifted = (pointerAngle - normalized + Math.PI * 2) % (Math.PI * 2);
+      const idx = Math.floor(shifted / slice) % n;
+      return { name: players[idx], color: colorFor(idx) };
     }
 
     function showWinner() {
-      const winner = getWinner();
-      const nameEl = document.getElementById('winnerName');
-      nameEl.textContent = winner.name;
-      nameEl.style.color = winner.color.light;
+      const w = getWinner();
+      document.getElementById('winnerName').textContent = w.name;
+      document.getElementById('winnerName').style.color = w.color.light;
       document.getElementById('winnerOverlay').classList.add('show');
-      launchConfetti(winner.color.fill);
+      launchConfetti();
     }
 
     document.getElementById('closeBtn').addEventListener('click', () => {
@@ -409,64 +573,119 @@
       spinBtn.disabled = false;
     });
 
+    // ── Admin panel ──
+    const panel = document.getElementById('panel');
+    const backdrop = document.getElementById('backdrop');
+
+    function openPanel() {
+      panel.classList.add('open');
+      backdrop.classList.add('open');
+      renderPlayerList();
+    }
+    function closePanel() {
+      panel.classList.remove('open');
+      backdrop.classList.remove('open');
+    }
+
+    document.getElementById('manageBtn').addEventListener('click', openPanel);
+    document.getElementById('panelClose').addEventListener('click', closePanel);
+    backdrop.addEventListener('click', closePanel);
+
+    function renderPlayerList() {
+      const list = document.getElementById('playerList');
+      list.innerHTML = '';
+
+      if (players.length === 0) {
+        list.innerHTML = '<p class="empty-note">No players yet. Add one below.</p>';
+        return;
+      }
+
+      players.forEach((name, i) => {
+        const col = colorFor(i);
+        const item = document.createElement('div');
+        item.className = 'player-item';
+        item.innerHTML = `
+          <span class="player-dot" style="background:${col.fill}"></span>
+          <span class="player-name">${escHtml(name)}</span>
+          <button class="player-remove" data-idx="${i}" title="Remove">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>`;
+        list.appendChild(item);
+      });
+
+      list.querySelectorAll('.player-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          players.splice(idx, 1);
+          savePlayers(players);
+          drawWheel(angle);
+          renderPlayerList();
+        });
+      });
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    const addInput = document.getElementById('addInput');
+    const addBtn = document.getElementById('addBtn');
+
+    function addPlayer() {
+      const name = addInput.value.trim();
+      if (!name || players.includes(name)) { addInput.focus(); return; }
+      players.push(name);
+      savePlayers(players);
+      addInput.value = '';
+      addInput.focus();
+      drawWheel(angle);
+      renderPlayerList();
+    }
+
+    addBtn.addEventListener('click', addPlayer);
+    addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addPlayer(); });
+
     // ── Confetti ──
     const cCanvas = document.getElementById('confetti');
     const cCtx = cCanvas.getContext('2d');
-    let confettiParticles = [];
-    let confettiFrame = null;
+    let confettiParticles = [], confettiFrame = null;
 
-    function resizeConfetti() {
-      cCanvas.width = window.innerWidth;
-      cCanvas.height = window.innerHeight;
-    }
+    function resizeConfetti() { cCanvas.width = window.innerWidth; cCanvas.height = window.innerHeight; }
     resizeConfetti();
     window.addEventListener('resize', resizeConfetti);
 
-    function launchConfetti(baseColor) {
+    function launchConfetti() {
       resizeConfetti();
-      const palette = ['#e8442a','#2db870','#7c4dcc','#d4a020','#fff','#f0c84a'];
+      const palette = PALETTE.map(c => c.fill).concat(['#fff','#f0c84a']);
       confettiParticles = Array.from({ length: 140 }, () => ({
-        x: Math.random() * cCanvas.width,
-        y: -10 - Math.random() * 200,
+        x: Math.random() * cCanvas.width, y: -10 - Math.random() * 200,
         r: 4 + Math.random() * 7,
         color: palette[Math.floor(Math.random() * palette.length)],
-        vx: (Math.random() - 0.5) * 4,
-        vy: 2 + Math.random() * 4,
-        rot: Math.random() * Math.PI * 2,
-        vrot: (Math.random() - 0.5) * 0.2,
+        vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4,
+        rot: Math.random() * Math.PI * 2, vrot: (Math.random() - 0.5) * 0.2,
         shape: Math.random() > 0.5 ? 'rect' : 'circle',
       }));
 
-      function animateConfetti() {
+      function animate() {
         cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
         confettiParticles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vrot;
-          p.vy += 0.06; // gravity
+          p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.vy += 0.06;
           cCtx.save();
-          cCtx.translate(p.x, p.y);
-          cCtx.rotate(p.rot);
+          cCtx.translate(p.x, p.y); cCtx.rotate(p.rot);
           cCtx.fillStyle = p.color;
           cCtx.globalAlpha = Math.max(0, 1 - p.y / (cCanvas.height * 1.1));
-          if (p.shape === 'rect') {
-            cCtx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r);
-          } else {
-            cCtx.beginPath();
-            cCtx.arc(0, 0, p.r * 0.7, 0, Math.PI * 2);
-            cCtx.fill();
-          }
+          if (p.shape === 'rect') { cCtx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r); }
+          else { cCtx.beginPath(); cCtx.arc(0, 0, p.r * 0.7, 0, Math.PI * 2); cCtx.fill(); }
           cCtx.restore();
         });
         confettiParticles = confettiParticles.filter(p => p.y < cCanvas.height + 30);
-        if (confettiParticles.length > 0) {
-          confettiFrame = requestAnimationFrame(animateConfetti);
-        } else {
-          cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
-        }
+        if (confettiParticles.length > 0) confettiFrame = requestAnimationFrame(animate);
+        else cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
       }
       if (confettiFrame) cancelAnimationFrame(confettiFrame);
-      confettiFrame = requestAnimationFrame(animateConfetti);
+      confettiFrame = requestAnimationFrame(animate);
     }
 
     function stopConfetti() {
