@@ -540,7 +540,7 @@
       localStorage.setItem('fw-players', JSON.stringify(list));
     }
 
-    let players = loadPlayers();
+    let players = loadPlayers().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
     // ── Canvas setup ──
     const canvas = document.getElementById('wheel');
@@ -834,6 +834,7 @@
       }
       if (!names.length) { addInput.focus(); return; }
       players.push(...names);
+      players.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
       savePlayers(players);
       addInput.value = '';
       addInput.focus();
