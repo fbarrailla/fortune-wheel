@@ -47,6 +47,25 @@
       margin-bottom: 2.5rem;
       color: oklch(92% 0.04 60);
       text-shadow: 0 2px 24px oklch(78% 0.19 60 / 0.3);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    h1:hover { opacity: 0.75; }
+
+    #wheelNameInput {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      color: oklch(92% 0.04 60);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid oklch(55% 0.12 60);
+      outline: none;
+      text-align: center;
+      width: min(600px, 90vw);
+      display: none;
     }
 
     /* ── Wheel ── */
@@ -441,7 +460,8 @@
 </head>
 <body>
 
-  <h1>Fortune Wheel</h1>
+  <h1 id="wheelTitle">Fortune Wheel</h1>
+  <input id="wheelNameInput" type="text" maxlength="60" />
   <div id="mainPlayerCount" style="font-size:0.85rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:-1.75rem;margin-bottom:2rem"></div>
 
   <div class="scene">
@@ -574,6 +594,49 @@
 
     let players = loadPlayers().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     let boosted = loadBoosted();
+
+    // ── Wheel name ──
+    const wheelTitle = document.getElementById('wheelTitle');
+    const wheelNameInput = document.getElementById('wheelNameInput');
+
+    function loadWheelName() {
+      return localStorage.getItem('fw-name') || 'Fortune Wheel';
+    }
+    function saveWheelName(name) {
+      localStorage.setItem('fw-name', name);
+    }
+
+    function applyWheelName(name) {
+      wheelTitle.textContent = name;
+      document.title = name;
+    }
+
+    applyWheelName(loadWheelName());
+
+    wheelTitle.addEventListener('click', () => {
+      wheelNameInput.value = wheelTitle.textContent;
+      wheelTitle.style.display = 'none';
+      wheelNameInput.style.display = 'block';
+      wheelNameInput.focus();
+      wheelNameInput.select();
+    });
+
+    function commitWheelName() {
+      const name = wheelNameInput.value.trim() || 'Fortune Wheel';
+      saveWheelName(name);
+      applyWheelName(name);
+      wheelNameInput.style.display = 'none';
+      wheelTitle.style.display = '';
+    }
+
+    wheelNameInput.addEventListener('blur', commitWheelName);
+    wheelNameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); wheelNameInput.blur(); }
+      if (e.key === 'Escape') {
+        wheelNameInput.value = wheelTitle.textContent;
+        wheelNameInput.blur();
+      }
+    });
 
     function wheelEntries() {
       const entries = [];
