@@ -334,6 +334,24 @@
     }
     .add-btn:hover { background: oklch(62% 0.16 270); }
 
+    .clear-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: none;
+      border: 1px solid oklch(38% 0.06 20);
+      border-radius: 4px;
+      color: oklch(52% 0.08 20);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .clear-btn:hover { color: oklch(68% 0.18 25); border-color: oklch(52% 0.14 20); background: oklch(22% 0.04 20); }
+    .clear-btn.confirming { color: oklch(72% 0.20 25); border-color: oklch(60% 0.18 25); background: oklch(24% 0.06 20); }
+
     .empty-note {
       text-align: center;
       color: var(--muted);
@@ -505,6 +523,7 @@
         <input class="add-input" id="addInput" type="text" placeholder="Add player(s), comma-separated…" maxlength="10000" />
         <button class="add-btn" id="addBtn">Add</button>
       </div>
+      <button class="clear-btn" id="clearAllBtn">Clear all players</button>
     </div>
   </div>
 
@@ -979,6 +998,31 @@
 
     addBtn.addEventListener('click', addPlayer);
     addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addPlayer(); });
+
+    // ── Clear all ──
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    let clearConfirmTimer = null;
+
+    clearAllBtn.addEventListener('click', () => {
+      if (clearAllBtn.classList.contains('confirming')) {
+        clearTimeout(clearConfirmTimer);
+        players.length = 0;
+        boosted.clear();
+        savePlayers(players);
+        saveBoosted();
+        drawWheel(angle);
+        renderPlayerList();
+        clearAllBtn.textContent = 'Clear all players';
+        clearAllBtn.classList.remove('confirming');
+      } else {
+        clearAllBtn.textContent = 'Tap again to confirm';
+        clearAllBtn.classList.add('confirming');
+        clearConfirmTimer = setTimeout(() => {
+          clearAllBtn.textContent = 'Clear all players';
+          clearAllBtn.classList.remove('confirming');
+        }, 3000);
+      }
+    });
 
     // ── Zoom modal ──
     const zoomBackdrop = document.getElementById('zoomBackdrop');
